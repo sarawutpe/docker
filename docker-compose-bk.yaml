@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  apache:
+    image: php:7.4-apache
+    ports:
+      - "127.0.0.1:80:80"
+    volumes:
+      - ./public_html:/var/www/html
+      - ./phpmyadmin.conf:/etc/apache2/sites-available/phpmyadmin.conf
+    networks:
+      - my-network
+
+  mariadb:
+    image: bitnami/mariadb:10.6.16
+    environment:
+      ALLOW_EMPTY_PASSWORD: yes
+      MARIADB_SKIP_TEST_DB: yes
+    ports:
+      - "3306:3306"
+    networks:
+      - my-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2.1
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: root
+      VIRTUAL_HOST: /phpmyadmin
+    ports:
+      - "8181:80"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
